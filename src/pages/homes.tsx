@@ -1,11 +1,24 @@
 import type { NextPage } from "next"
 import Head from "next/head"
+import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
 import homeData from "../../data/homes.json"
 import Card from "../components/Card"
 
 const Homes: NextPage = () => {
-  return (
-    <div className="bg-gray-200 pb-96 pt-5">
+  const { push } = useRouter()
+  const [authenticated, setAuthenticated] = useState(false)
+
+  useEffect(() => {
+    if (localStorage.getItem("user") === "false") {
+      push("/login")
+    } else {
+      setAuthenticated(true)
+    }
+  }, [push])
+
+  return authenticated ? (
+    <div className="bg-gray-200 h-screen pt-5">
       <Head>
         <title>View Homes</title>
         <meta name="description" content="Homes" />
@@ -19,6 +32,8 @@ const Homes: NextPage = () => {
         </div>
       </main>
     </div>
+  ) : (
+    <></>
   )
 }
 

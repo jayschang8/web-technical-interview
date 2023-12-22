@@ -6,7 +6,7 @@ const Home: NextPage = () => {
   const { push } = useRouter()
 
   useEffect(() => {
-    push("/homes")
+    push("/login")
   }, [push])
 
   return <></>

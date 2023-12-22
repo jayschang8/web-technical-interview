@@ -33,7 +33,7 @@ const Card = (props: IProps): JSX.Element => {
   return (
     <div className="rounded-xl mx-6 overflow-hidden mb-8">
       <div className="w-fill h-[400px] relative sm:h-[600px] lg:h-[700px] xl:h-[250px]">
-        <Image src="/home.jpeg" alt="home" layout="fill" />
+        <Image src="/house.jpeg" alt="home" layout="fill" />
       </div>
       <div className="rounded-lg -mt-10 bg-white z-2 relative px-4 pb-6 pt-3">
         <h3 className="text-base font-extrabold text-gray-700">
