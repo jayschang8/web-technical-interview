@@ -4,13 +4,29 @@ import {
   faBed,
   faCalendar,
   faHouse,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { initializeApp } from "firebase/app"
+import type { DocumentData } from "firebase/firestore/lite"
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore/lite"
 import Image from "next/image"
-import type { Home } from "../types/home"
+import config from "../config"
+
+const app = initializeApp(config.firebase)
+const db = getFirestore(app)
 
 interface IProps {
-  home: Home
+  home: DocumentData
+  getHomes: () => void
 }
 
 const Card = (props: IProps): JSX.Element => {
@@ -30,6 +46,19 @@ const Card = (props: IProps): JSX.Element => {
     )
   }
 
+  const handleDelete = async () => {
+    const q = query(
+      collection(db, "homes"),
+      where("address", "==", props.home.address)
+    )
+    const querySnapshot = await getDocs(q)
+    querySnapshot.forEach(async (document) => {
+      const docRef = doc(db, "homes", document.id)
+      await deleteDoc(docRef)
+    })
+    await props.getHomes()
+  }
+
   return (
     <div className="rounded-xl mx-6 overflow-hidden mb-8">
       <div className="w-fill h-[400px] relative sm:h-[600px] lg:h-[700px] xl:h-[250px]">
@@ -45,6 +74,12 @@ const Card = (props: IProps): JSX.Element => {
           {iconSet(faCalendar, props.home.yearBuilt)}
           {iconSet(faBath, props.home.bathrooms)}
           {iconSet(faHouse, props.home.sqft)}
+        </div>
+        <div
+          className="absolute z-100 w-4 right-3 top-3 cursor-pointer"
+          onClick={handleDelete}
+        >
+          <FontAwesomeIcon className="text-red-500" icon={faTrash} size="xs" />
         </div>
       </div>
     </div>

@@ -30,7 +30,6 @@ const Homes: NextPage = () => {
     const homeSnapshot = await getDocs(homesCol)
     const homeList = homeSnapshot.docs.map((doc) => doc.data())
     setHomes(homeList)
-    console.log(homeList)
   }
 
   return authenticated ? (
@@ -43,7 +42,7 @@ const Homes: NextPage = () => {
       <main>
         <div className="flex mx-4 flex-col xl:flex-row">
           {homes.map((home) => {
-            return <Card home={home} key={home.id} />
+            return <Card getHomes={getHomes} home={home} key={home.id} />
           })}
         </div>
       </main>
