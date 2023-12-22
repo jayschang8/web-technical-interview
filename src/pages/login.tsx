@@ -1,10 +1,16 @@
+import { initializeApp } from "firebase/app"
+import type { DocumentData } from "firebase/firestore/lite"
+import { collection, getDocs, getFirestore } from "firebase/firestore/lite"
 import type { NextPage } from "next"
 import Head from "next/head"
 import Image from "next/image"
 import { useRouter } from "next/router"
 import type { ChangeEvent, SyntheticEvent } from "react"
 import { useEffect, useState } from "react"
-import userData from "../../data/users.json"
+import config from "../config"
+
+const app = initializeApp(config.firebase)
+const db = getFirestore(app)
 
 const Login: NextPage = () => {
   const [email, setEmail] = useState("")
@@ -13,9 +19,10 @@ const Login: NextPage = () => {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [redirect, setRedirect] = useState(false)
+  const [users, setUsers] = useState<DocumentData[]>([])
 
   const validate = (): void => {
-    const matches = userData.filter(
+    const matches = users.filter(
       (user) => user.email === email && user.password === password
     )
     if (matches.length > 0) {
@@ -35,14 +42,23 @@ const Login: NextPage = () => {
   }
 
   useEffect(() => {
-    localStorage.setItem("user", "false")
     if (redirect) {
       const timer = setTimeout(() => {
         push("/homes")
       }, 3000)
       return () => clearTimeout(timer)
+    } else {
+      localStorage.setItem("user", "false")
+      getUsers()
     }
   }, [redirect, push])
+
+  const getUsers = async () => {
+    const usersCol = collection(db, "users")
+    const userSnapshot = await getDocs(usersCol)
+    const userList = userSnapshot.docs.map((doc) => doc.data())
+    setUsers(userList)
+  }
 
   return (
     <div>

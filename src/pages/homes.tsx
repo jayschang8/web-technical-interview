@@ -1,21 +1,37 @@
+import { initializeApp } from "firebase/app"
+import type { DocumentData } from "firebase/firestore/lite"
+import { collection, getDocs, getFirestore } from "firebase/firestore/lite"
 import type { NextPage } from "next"
 import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import homeData from "../../data/homes.json"
 import Card from "../components/Card"
+import config from "../config"
+
+const app = initializeApp(config.firebase)
+const db = getFirestore(app)
 
 const Homes: NextPage = () => {
   const { push } = useRouter()
   const [authenticated, setAuthenticated] = useState(false)
+  const [homes, setHomes] = useState<DocumentData[]>([])
 
   useEffect(() => {
     if (localStorage.getItem("user") === "false") {
       push("/login")
     } else {
       setAuthenticated(true)
+      getHomes()
     }
   }, [push])
+
+  const getHomes = async () => {
+    const homesCol = collection(db, "homes")
+    const homeSnapshot = await getDocs(homesCol)
+    const homeList = homeSnapshot.docs.map((doc) => doc.data())
+    setHomes(homeList)
+    console.log(homeList)
+  }
 
   return authenticated ? (
     <div className="bg-gray-200 h-screen pt-5">
@@ -26,7 +42,7 @@ const Homes: NextPage = () => {
       </Head>
       <main>
         <div className="flex mx-4 flex-col xl:flex-row">
-          {homeData.map((home) => {
+          {homes.map((home) => {
             return <Card home={home} key={home.id} />
           })}
         </div>
